@@ -1,6 +1,6 @@
 { "scripts": {
   "start": "node server.js",
-  "start-schema": "node app/models/Create-schema && node server.js"
+  "start-schema": "node app/models/Schema.js && node server.js"
 },
   "dependencies": {
     "bcrypt": "^5.1.1",

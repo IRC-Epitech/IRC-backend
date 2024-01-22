@@ -4,6 +4,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mongoose = require('mongoose'); // Ajout de Mongoose
 const PORT = process.env.PORT || 3000;
+require('./app/models/Schema');
 
 // Middlewares, par exemple pour le parsing JSON
 app.use(express.json());
