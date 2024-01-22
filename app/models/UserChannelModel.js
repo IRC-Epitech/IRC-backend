@@ -7,4 +7,4 @@ const userChannelSchema = new Schema({
     joinedDate: { type: Date, default: Date.now },
 });
 
-const UserChannel = mongoose.model('UserChannel', userChannelSchema);
+const UserChannelModel = mongoose.model('UserChannel', userChannelSchema);
