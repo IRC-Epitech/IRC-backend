@@ -1,6 +1,6 @@
 // script de test pour créer un utilisateur
 const mongoose = require('mongoose');
-const User = require('./app/models/User'); // Assurez-vous que le chemin est correct
+const User = require('./app/models/UserModel'); // Assurez-vous que le chemin est correct
 
 mongoose.connect('mongodb://localhost:27017/IRC', {
     useNewUrlParser: true,
