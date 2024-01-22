@@ -4,28 +4,18 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;
-require('./app/utils/ExportModels');
+require('./app/utils/ExportModels'); // Assurez-vous que ce fichier est nécessaire
 const applyRoutes = require('./app/utils/routeUtils');
-const bodyParser = require('body-parser')
 
-// Appliquez tous les routeurs
-applyRoutes(app);
-
-app.use(bodyParser.urlencoded({ extended: false }))
-
-// parse application/json
-app.use(bodyParser.json())
-
-// Middlewares, par exemple pour le parsing JSON
+// Middlewares pour le parsing JSON et le parsing des données URL-encoded
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Remplace bodyParser.urlencoded
 
 // Static files
 app.use(express.static('public'));
 
-// Import des routes
-const router = require('./app/routes');
-app.use(router);
-
+// Appliquez tous les routeurs
+applyRoutes(app);
 
 // Connexion à MongoDB
 mongoose.connect('mongodb://localhost:27017/IRC', {
@@ -42,12 +32,10 @@ db.once('open', function() {
 // Gestion des connexions Socket.IO
 io.on('connection', (socket) => {
     console.log('Un utilisateur est connecté');
-
     socket.on('disconnect', () => {
         console.log('Un utilisateur s’est déconnecté');
     });
-
-    // Vous pouvez ajouter d'autres gestionnaires d'événements Socket.IO ici
+    // ... autres gestionnaires d'événements Socket.IO ...
 });
 
 // Démarrage du serveur
