@@ -5,6 +5,16 @@ const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;
 require('./app/utils/ExportModels');
+const applyRoutes = require('./app/utils/routeUtils');
+const bodyParser = require('body-parser')
+
+// Appliquez tous les routeurs
+applyRoutes(app);
+
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 
 // Middlewares, par exemple pour le parsing JSON
 app.use(express.json());
@@ -15,6 +25,7 @@ app.use(express.static('public'));
 // Import des routes
 const router = require('./app/routes');
 app.use(router);
+
 
 // Connexion à MongoDB
 mongoose.connect('mongodb://localhost:27017/IRC', {

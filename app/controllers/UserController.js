@@ -12,6 +12,7 @@ exports.createUser = async (req, res) => {
         await user.save();
         res.status(201).send(user);
     } catch (error) {
+        console.log(error)
         res.status(500).send(error);
     }
 };
