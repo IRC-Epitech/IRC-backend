@@ -1,5 +1,6 @@
 const express = require('express');
-const http = require('http').createServer(express());
+const app = express(); // Créez une instance unique d'Express
+const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;
@@ -7,11 +8,12 @@ const applyRoutes = require('./app/utils/routeUtils');
 const socketUserService = require('./app/services/socketUserService');
 const socketMessageService = require('./app/services/socketMessageService');
 
-express().use(express.json())
-    .use(express.urlencoded({ extended: true }))
-    .use(express.static('public'));
+// Utilisez l'instance 'app' au lieu de créer une nouvelle instance à chaque fois
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-applyRoutes(express());
+// Appliquez les routes à l'instance 'app'
+applyRoutes(app);
 
 mongoose.connect('mongodb://localhost:27017/IRC')
     .then(() => console.log("Connecté avec succès à MongoDB"))

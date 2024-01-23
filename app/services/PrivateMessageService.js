@@ -21,10 +21,14 @@ const getMessagesFromSenderToReceiver = async (senderId, receiverId) => {
     return PrivateMessage.find({sender: senderId, receiver: receiverId});
 };
 
+const postMessagesFromSenderToReceiver = async (senderId, receiverId) => {
+    return PrivateMessage.find({sender: senderId, receiver: receiverId});
+};
 module.exports = {
     createPrivateMessage,
     getPrivateMessageById,
     updatePrivateMessage,
     deletePrivateMessage,
-    getMessagesFromSenderToReceiver
+    getMessagesFromSenderToReceiver,
+    postMessagesFromSenderToReceiver
 };
