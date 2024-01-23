@@ -8,3 +8,5 @@ const FileUploadSchema = new Schema({
 });
 
 const FileUpload = mongoose.model('FileUpload', FileUploadSchema);
+
+module.exports = FileUpload;

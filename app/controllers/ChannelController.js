@@ -1,22 +1,19 @@
-const Channel = require('../models/ChannelModel');
+const channelService = require('../services/ChannelService');
 
-// Créer un canal
 exports.createChannel = async (req, res) => {
     try {
-        const newChannel = new Channel(req.body);
-        await newChannel.save();
-        res.status(201).send(newChannel);
+        const channel = await channelService.createChannel(req.body);
+        res.status(201).send(channel);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
-// Lire un canal
 exports.getChannel = async (req, res) => {
     try {
-        const channel = await Channel.findById(req.params.channelId);
+        const channel = await channelService.getChannelById(req.params.channelId);
         if (!channel) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'Channel not found' });
         }
         res.status(200).send(channel);
     } catch (error) {
@@ -24,12 +21,11 @@ exports.getChannel = async (req, res) => {
     }
 };
 
-// Mettre à jour un canal
 exports.updateChannel = async (req, res) => {
     try {
-        const channel = await Channel.findByIdAndUpdate(req.params.channelId, req.body, { new: true });
+        const channel = await channelService.updateChannel(req.params.channelId, req.body);
         if (!channel) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'Channel not found' });
         }
         res.status(200).send(channel);
     } catch (error) {
@@ -37,14 +33,13 @@ exports.updateChannel = async (req, res) => {
     }
 };
 
-// Supprimer un canal
 exports.deleteChannel = async (req, res) => {
     try {
-        const channel = await Channel.findByIdAndDelete(req.params.channelId);
+        const channel = await channelService.deleteChannel(req.params.channelId);
         if (!channel) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'Channel not found' });
         }
-        res.status(200).send(channel);
+        res.status(200).send({ message: 'Channel deleted successfully' });
     } catch (error) {
         res.status(500).send(error);
     }

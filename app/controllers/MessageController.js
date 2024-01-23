@@ -1,22 +1,19 @@
-const Message = require('../models/MessageModel');
+const messageService = require('../services/messageService');
 
-// Créer un message
 exports.createMessage = async (req, res) => {
     try {
-        const newMessage = new Message(req.body);
-        await newMessage.save();
-        res.status(201).send(newMessage);
+        const message = await messageService.createMessage(req.body);
+        res.status(201).send(message);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
-// Lire un message
 exports.getMessage = async (req, res) => {
     try {
-        const message = await Message.findById(req.params.messageId).populate('user');
+        const message = await messageService.getMessageById(req.params.messageId);
         if (!message) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'Message not found' });
         }
         res.status(200).send(message);
     } catch (error) {
@@ -24,27 +21,25 @@ exports.getMessage = async (req, res) => {
     }
 };
 
-// Mettre à jour un message
 exports.updateMessage = async (req, res) => {
     try {
-        const message = await Message.findByIdAndUpdate(req.params.messageId, req.body, { new: true });
-        if (!message) {
-            return res.status(404).send();
+        const updatedMessage = await messageService.updateMessage(req.params.messageId, req.body);
+        if (!updatedMessage) {
+            return res.status(404).send({ message: 'Message not found' });
         }
-        res.status(200).send(message);
+        res.status(200).send(updatedMessage);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
-// Supprimer un message
 exports.deleteMessage = async (req, res) => {
     try {
-        const message = await Message.findByIdAndDelete(req.params.messageId);
-        if (!message) {
-            return res.status(404).send();
+        const deletedMessage = await messageService.deleteMessage(req.params.messageId);
+        if (!deletedMessage) {
+            return res.status(404).send({ message: 'Message not found' });
         }
-        res.status(200).send(message);
+        res.status(200).send({ message: 'Message deleted successfully' });
     } catch (error) {
         res.status(500).send(error);
     }

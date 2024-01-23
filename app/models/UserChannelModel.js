@@ -8,3 +8,5 @@ const userChannelSchema = new Schema({
 });
 
 const UserChannelModel = mongoose.model('UserChannel', userChannelSchema);
+
+module.exports = UserChannelModel;

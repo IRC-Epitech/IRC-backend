@@ -1,26 +1,21 @@
-const UserChannel = require('../models/UserChannelModel');
+const userChannelService = require('../services/UserChannelService');
 
 // Ajouter un utilisateur à un canal
 exports.addUserToChannel = async (req, res) => {
     try {
-        const newUserChannel = new UserChannel({
-            user: req.body.user,
-            channel: req.body.channel,
-            joinedDate: req.body.joinedDate || new Date()
-        });
-        await newUserChannel.save();
-        res.status(201).send(newUserChannel);
+        const userChannel = await userChannelService.addUserToChannel(req.body);
+        res.status(201).send(userChannel);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
-// Obtenir les détails de UserChannel
+// Obtenir une association utilisateur-canal par ID
 exports.getUserChannel = async (req, res) => {
     try {
-        const userChannel = await UserChannel.findById(req.params.userChannelId);
+        const userChannel = await userChannelService.getUserChannelById(req.params.userChannelId);
         if (!userChannel) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'UserChannel not found' });
         }
         res.status(200).send(userChannel);
     } catch (error) {
@@ -28,25 +23,25 @@ exports.getUserChannel = async (req, res) => {
     }
 };
 
-// Mettre à jour UserChannel
+// Mettre à jour une association utilisateur-canal
 exports.updateUserChannel = async (req, res) => {
     try {
-        const userChannel = await UserChannel.findByIdAndUpdate(req.params.userChannelId, req.body, { new: true });
-        if (!userChannel) {
-            return res.status(404).send();
+        const updatedUserChannel = await userChannelService.updateUserChannel(req.params.userChannelId, req.body);
+        if (!updatedUserChannel) {
+            return res.status(404).send({ message: 'UserChannel not found' });
         }
-        res.status(200).send(userChannel);
+        res.status(200).send(updatedUserChannel);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
-// Supprimer un UserChannel
+// Supprimer une association utilisateur-canal
 exports.deleteUserChannel = async (req, res) => {
     try {
-        const userChannel = await UserChannel.findByIdAndDelete(req.params.userChannelId);
-        if (!userChannel) {
-            return res.status(404).send();
+        const deletedUserChannel = await userChannelService.deleteUserChannel(req.params.userChannelId);
+        if (!deletedUserChannel) {
+            return res.status(404).send({ message: 'UserChannel not found' });
         }
         res.status(200).send({ message: 'UserChannel deleted successfully' });
     } catch (error) {

@@ -1,26 +1,19 @@
-const FileUpload = require('../models/FileUploadModel');
+const fileUploadService = require('../services/FileUploadService');
 
-// Créer un fichier upload
 exports.createFileUpload = async (req, res) => {
     try {
-        const newFileUpload = new FileUpload({
-            user: req.body.user,
-            filePath: req.body.filePath,
-            uploadDate: req.body.uploadDate || new Date()
-        });
-        await newFileUpload.save();
-        res.status(201).send(newFileUpload);
+        const fileUpload = await fileUploadService.createFileUpload(req.body);
+        res.status(201).send(fileUpload);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
-// Lire un fichier upload
 exports.getFileUpload = async (req, res) => {
     try {
-        const fileUpload = await FileUpload.findById(req.params.fileUploadId);
+        const fileUpload = await fileUploadService.getFileUploadById(req.params.fileUploadId);
         if (!fileUpload) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'File upload not found' });
         }
         res.status(200).send(fileUpload);
     } catch (error) {
@@ -28,12 +21,11 @@ exports.getFileUpload = async (req, res) => {
     }
 };
 
-// Mettre à jour un fichier upload
 exports.updateFileUpload = async (req, res) => {
     try {
-        const fileUpload = await FileUpload.findByIdAndUpdate(req.params.fileUploadId, req.body, { new: true });
+        const fileUpload = await fileUploadService.updateFileUpload(req.params.fileUploadId, req.body);
         if (!fileUpload) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'File upload not found' });
         }
         res.status(200).send(fileUpload);
     } catch (error) {
@@ -41,12 +33,11 @@ exports.updateFileUpload = async (req, res) => {
     }
 };
 
-// Supprimer un fichier upload
 exports.deleteFileUpload = async (req, res) => {
     try {
-        const fileUpload = await FileUpload.findByIdAndDelete(req.params.fileUploadId);
+        const fileUpload = await fileUploadService.deleteFileUpload(req.params.fileUploadId);
         if (!fileUpload) {
-            return res.status(404).send();
+            return res.status(404).send({ message: 'File upload not found' });
         }
         res.status(200).send({ message: 'File upload deleted successfully' });
     } catch (error) {

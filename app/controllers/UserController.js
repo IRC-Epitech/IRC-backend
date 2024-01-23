@@ -1,48 +1,49 @@
-const bcrypt = require('bcrypt');
-const User = require('../models/UserModel');
+const userService = require('../services/UserService');
 
+// Créer un utilisateur
 exports.createUser = async (req, res) => {
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const user = new User({
-            username: req.body.username,
-            email: req.body.email,
-            password: hashedPassword
-        });
-        await user.save();
+        const user = await userService.createUser(req.body);
         res.status(201).send(user);
     } catch (error) {
-        console.log(error)
         res.status(500).send(error);
     }
 };
 
+// Obtenir un utilisateur par ID
 exports.getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.userId);
+        const user = await userService.getUserById(req.params.userId);
+        if (!user) {
+            return res.status(404).send({ message: 'Utilisateur non trouvé' });
+        }
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
+// Mettre à jour un utilisateur
 exports.updateUser = async (req, res) => {
     try {
-        const update = req.body;
-        if (update.password) {
-            update.password = await bcrypt.hash(update.password, 10);
+        const updatedUser = await userService.updateUser(req.params.userId, req.body);
+        if (!updatedUser) {
+            return res.status(404).send({ message: 'Utilisateur non trouvé' });
         }
-        const user = await User.findByIdAndUpdate(req.params.userId, update, { new: true });
-        res.status(200).send(user);
+        res.status(200).send(updatedUser);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
+// Supprimer un utilisateur
 exports.deleteUser = async (req, res) => {
     try {
-        await User.findByIdAndDelete(req.params.userId);
-        res.status(200).send({ message: 'User deleted' });
+        const deletedUser = await userService.deleteUser(req.params.userId);
+        if (!deletedUser) {
+            return res.status(404).send({ message: 'Utilisateur non trouvé' });
+        }
+        res.status(200).send({ message: 'Utilisateur supprimé' });
     } catch (error) {
         res.status(500).send(error);
     }

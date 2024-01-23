@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat en temps réel</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const socket = io();
+            const userId = '65ae8091e7eec9a9ffcde5d8'; // Remplacer par l'ID d'utilisateur actuel
+            const otherUserId = '65ae97cca8128bbf5ef21319'; // Remplacer par l'ID de l'autre utilisateur
+
+            // Rejoindre une room privée
+            socket.emit('joinRoom', { userId, otherUserId });
+            console.log(userId)
+
+            // Écouter les messages privés
+            socket.on('newPrivateMessage', function (message) {
+                const messagesContainer = document.getElementById('messages');
+                const messageElement = document.createElement('div');
+                messageElement.innerText = message.content;
+                messagesContainer.appendChild(messageElement);
+            });
+
+            // Envoyer un message privé
+            document.getElementById('sendButton').addEventListener('click', function () {
+                const messageContent = document.getElementById('messageInput').value;
+                socket.emit('privateMessage', { content: messageContent, toUserId: otherUserId, fromUserId: userId });
+                document.getElementById('messageInput').value = '';
+            });
+        });
+    </script>
+</head>
+<body>
+<h1>Chat en temps réel</h1>
+<div id="messages"></div>
+<input type="text" id="messageInput" placeholder="Écrivez un message">
+<button id="sendButton">Envoyer</button>
+</body>
+</html>
