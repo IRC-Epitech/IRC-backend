@@ -8,7 +8,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const socket = io();
             const userId = '65ae8091e7eec9a9ffcde5d8'; // Remplacer par l'ID d'utilisateur actuel
-            const otherUserId = '65ae97cca8128bbf5ef21319'; // Remplacer par l'ID de l'autre utilisateur
+            const otherUserId = '65ae8091e7eec9a9ffcde5d8'; // Remplacer par l'ID de l'autre utilisateur
 
             // Rejoindre une room privée
             socket.emit('joinRoom', { userId, otherUserId });
