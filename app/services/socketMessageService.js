@@ -1,4 +1,4 @@
-const Message = require('../models/MessageModel');
+const Message = require('../models/PrivateMessageModel');
 
 module.exports = (io, socket) => {
     socket.on('privateMessage', async ({ content, toUserId, fromUserId }) => {

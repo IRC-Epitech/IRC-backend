@@ -9,17 +9,28 @@
             const socket = io();
             const userId = '65ae8091e7eec9a9ffcde5d8'; // Remplacer par l'ID d'utilisateur actuel
             const otherUserId = '65ae8091e7eec9a9ffcde5d8'; // Remplacer par l'ID de l'autre utilisateur
+            const messagesContainer = document.getElementById('messages');
 
-            // Rejoindre une room privée
-            socket.emit('joinRoom', { userId, otherUserId });
-            console.log(userId)
-
-            // Écouter les messages privés
-            socket.on('newPrivateMessage', function (message) {
-                const messagesContainer = document.getElementById('messages');
+            // Fonction pour ajouter un message au DOM
+            function addMessageToDOM(message) {
                 const messageElement = document.createElement('div');
                 messageElement.innerText = message.content;
                 messagesContainer.appendChild(messageElement);
+            }
+
+            // Requête initiale pour charger les messages existants
+            fetch('/messages') // Assurez-vous que cette route est correcte
+                .then(response => response.json())
+                .then(messages => {
+                    messages.forEach(addMessageToDOM);
+                });
+
+            // Rejoindre une room privée
+            socket.emit('joinRoom', { userId, otherUserId });
+
+            // Écouter les messages privés
+            socket.on('newPrivateMessage', function (message) {
+                addMessageToDOM(message);
             });
 
             // Envoyer un message privé

@@ -1,7 +1,7 @@
 const userRoutes = require('../routes/UserRoutes');
 const channelRoutes = require('../routes/ChannelRoutes');
 const fileUploadRoutes = require('../routes/FileUploadRoutes');
-const messageRoutes = require('../routes/MessageRoutes');
+const messageRoutes = require('../routes/PrivateMessageRoutes');
 const userChannelRoutes = require('../routes/UserChannelRoutes');
 
 const applyRoutes = (app) => {
