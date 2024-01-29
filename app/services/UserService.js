@@ -1,5 +1,6 @@
 const User = require('../models/UserModel');
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 
 const createUser = async (userData) => {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -22,9 +23,31 @@ const deleteUser = async (userId) => {
     return User.findByIdAndDelete(userId);
 };
 
+const secretKey = process.env.JWT_SECRET;
+console.log("Clé secrète JWT :", secretKey);
+
+const authenticateUser = async (email, password) => {
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw new Error('Utilisateur non trouvé');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        throw new Error('Mot de passe incorrect');
+    }
+
+    const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '24h' });
+    user.token = token;
+    await user.save();
+
+    return { token, user };
+};
+
 module.exports = {
     createUser,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    authenticateUser
 };

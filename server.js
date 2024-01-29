@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express(); // Créez une instance unique d'Express
 const http = require('http').createServer(app);
@@ -7,6 +8,8 @@ const PORT = process.env.PORT || 3000;
 const applyRoutes = require('./app/utils/routeUtils');
 const socketUserService = require('./app/services/socketUserService');
 const socketMessageService = require('./app/services/socketMessageService');
+
+
 
 // Utilisez l'instance 'app' au lieu de créer une nouvelle instance à chaque fois
 app.use(express.json());

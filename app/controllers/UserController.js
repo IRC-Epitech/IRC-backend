@@ -15,7 +15,7 @@ exports.getUser = async (req, res) => {
     try {
         const user = await userService.getUserById(req.params.userId);
         if (!user) {
-            return res.status(404).send({ message: 'Utilisateur non trouvé' });
+            return res.status(404).send({message: 'Utilisateur non trouvé'});
         }
         res.status(200).send(user);
     } catch (error) {
@@ -28,7 +28,7 @@ exports.updateUser = async (req, res) => {
     try {
         const updatedUser = await userService.updateUser(req.params.userId, req.body);
         if (!updatedUser) {
-            return res.status(404).send({ message: 'Utilisateur non trouvé' });
+            return res.status(404).send({message: 'Utilisateur non trouvé'});
         }
         res.status(200).send(updatedUser);
     } catch (error) {
@@ -41,10 +41,23 @@ exports.deleteUser = async (req, res) => {
     try {
         const deletedUser = await userService.deleteUser(req.params.userId);
         if (!deletedUser) {
-            return res.status(404).send({ message: 'Utilisateur non trouvé' });
+            return res.status(404).send({message: 'Utilisateur non trouvé'});
         }
-        res.status(200).send({ message: 'Utilisateur supprimé' });
+        res.status(200).send({message: 'Utilisateur supprimé'});
     } catch (error) {
         res.status(500).send(error);
     }
+
 };
+
+exports.loginUser = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        const {token, user} = await userService.authenticateUser(email, password);
+        res.status(200).json({token, user: {id: user._id, email: user.email}});
+    } catch (error) {
+        res.status(401).send({message: error.message});
+    }
+};
+
+
