@@ -1,4 +1,5 @@
 require('dotenv').config();
+const cors = require('cors');
 const express = require('express');
 const app = express(); // Créez une instance unique d'Express
 const http = require('http').createServer(app);
@@ -12,6 +13,7 @@ const socketMessageService = require('./app/services/socketMessageService');
 
 
 // Utilisez l'instance 'app' au lieu de créer une nouvelle instance à chaque fois
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
