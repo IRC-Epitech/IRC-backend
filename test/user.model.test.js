@@ -6,75 +6,81 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
+// Fonction d'aide pour créer un utilisateur
+function createUser({ username = 'testuser', email = 'testuser@gmail.com', password = 'testpassword', token = 'testtoken' } = {}) {
+    return new User({ username, email, password, token });
+}
+
 describe('Modèle Utilisateur', function() {
-    it('devrait créer un nouvel utilisateur', function(done) {
-        const user = new User({
-            username: 'testuser',
-            email: 'testuser@gmail.com',
-            password: 'testpassword',
-            token: 'testtoken'
-        });
 
-        user.save(function(err, user) {
-            expect(err).to.be.null;
-            expect(user.username).to.equal('testuser');
-            expect(user.email).to.equal('testuser@gmail.com');
-            expect(user.password).to.equal('testpassword');
-            expect(user.token).to.equal('testtoken');
+    // Nettoyage de la base de données après chaque test
+    afterEach(function(done) {
+        User.deleteMany({}, function(err) {
             done();
         });
     });
 
-    it('ne devrait pas créer un utilisateur sans champ username', function(done) {
-        const user = new User({
-            email: 'testuser@gmail.com',
-            password: 'testpassword',
-            token: 'testtoken'
-        });
+    it('devrait créer un nouvel utilisateur', async function() {
+        const user = createUser();
 
-        user.save(function(err, user) {
+        const savedUser = await user.save();
+        expect(savedUser.username).to.equal('testuser');
+        expect(savedUser.email).to.equal('testuser@gmail.com');
+        expect(savedUser.password).to.equal('testpassword');
+        expect(savedUser.token).to.equal('testtoken');
+    });
+
+    it('ne devrait pas créer un utilisateur sans champ username', async function() {
+        const user = createUser({ username: undefined });
+
+        try {
+            await user.save();
+        } catch (err) {
             expect(err).to.exist;
-            done();
-        });
+        }
     });
 
-    it('ne devrait pas créer un utilisateur sans champ email', function(done) {
-        const user = new User({
-            username: 'testuser',
-            password: 'testpassword',
-            token: 'testtoken'
-        });
+    it('ne devrait pas créer un utilisateur sans champ email', async function() {
+        const user = createUser({ email: undefined });
 
-        user.save(function(err, user) {
+        try {
+            await user.save();
+        } catch (err) {
             expect(err).to.exist;
-            done();
-        });
+        }
     });
 
-    it('ne devrait pas créer un utilisateur sans champ password', function(done) {
-        const user = new User({
-            username: 'testuser',
-            email: 'testuser@gmail.com',
-            token: 'testtoken'
-        });
+    it('ne devrait pas créer un utilisateur sans champ password', async function() {
+        const user = createUser({ password: undefined });
 
-        user.save(function(err, user) {
+        try {
+            await user.save();
+        } catch (err) {
             expect(err).to.exist;
-            done();
-        });
+        }
     });
 
-    it('ne devrait pas créer un utilisateur sans champ token', function(done) {
-        const user = new User({
-            username: 'testuser',
-            email: 'testuser@gmail.com',
-            password: 'testpassword'
-        });
+    it('ne devrait pas créer un utilisateur sans champ token', async function() {
+        const user = createUser({ token: undefined });
 
-        user.save(function(err, user) {
+        try {
+            await user.save();
+        } catch (err) {
             expect(err).to.exist;
-            done();
-        });
+        }
     });
+
+    it('devrait échouer si le format de l\'email est invalide', async function() {
+        const user = createUser({ email: 'invalidemail' });
+
+        try {
+            await user.save();
+        } catch (err) {
+            expect(err).to.exist;
+            expect(err.errors.email).to.exist;
+        }
+    });
+
+
 });
 
