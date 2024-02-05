@@ -43,11 +43,20 @@ const authenticateUser = async (email, password) => {
 
     return { token, user };
 };
+// Obtenir tous les utilisateurs
+exports.getAllUsers = async () => {
+    try {
+        return await User.find({});
+    } catch (error) {
+        throw error;
+    }
+};
 
 module.exports = {
     createUser,
     getUserById,
     updateUser,
     deleteUser,
-    authenticateUser
+    authenticateUser,
+    getAllUsers
 };
