@@ -44,7 +44,7 @@ const authenticateUser = async (email, password) => {
     return { token, user };
 };
 // Obtenir tous les utilisateurs
-exports.getAllUsers = async () => {
+const getAllUsers = async () => {
     try {
         return await User.find({});
     } catch (error) {
