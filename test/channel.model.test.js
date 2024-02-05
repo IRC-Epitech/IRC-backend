@@ -5,7 +5,6 @@ const faker = require('faker');
 const mongoose = require('mongoose');
 const sandbox = sinon.createSandbox();
 
-const { app } = require('../server');
 const { Channel } = require('../app/models/ChannelModel');
 
 chai.use(chaiHttp);
