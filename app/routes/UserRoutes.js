@@ -7,6 +7,7 @@ router.post('/users', userController.createUser);
 router.get('/users/:userId', authMiddleware,userController.getUser);
 router.put('/users/:userId', authMiddleware,userController.updateUser);
 router.delete('/users/:userId', authMiddleware,userController.deleteUser);
+router.get('/users', authMiddleware, userController.getAllUsers);
 router.post('/login', userController.loginUser);
 
 
