@@ -60,4 +60,13 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+// Obtenir tous les utilisateurs
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await userService.getAllUsers();
+        res.status(200).send(users);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
 
