@@ -46,7 +46,7 @@ const authenticateUser = async (email, password) => {
 
     // delete user.password;
     const userSerialized = {
-        _id: user._id,
+        id: user._id,
         username: user.username,
         email: user.email
     }
