@@ -1,59 +1,82 @@
-class SocketManager {
-    io;
-    connectedUsers = [];
+const User = require('../models/UserModel');
 
-    constructor(io) {
-        this.io = io;
-    }
+let io;
+connectedUsers = [];
 
-    init() {
-        console.log("Socket.io initialisé avec succès")
 
-        this.io.on('connection', (socket) => {
-            console.log(`Un utilisateur est connecté, ID: ${socket.id}`);
+const init = (_io) => {
+    io = _io;
+    console.log("Socket.io initialisé avec succès");
 
-            // Simuler l'ajout d'un utilisateur avec des données plus détaillées
-            const newUser = {
-                socketId: socket.id,
-                // Ajoutez ici d'autres attributs pertinents, comme username, userId, etc.
-                username: `User_${socket.id.substring(0, 5)}`, // Exemple de génération de nom
-                // Supposons que vous avez une fonction pour obtenir une image par défaut ou une image d'utilisateur
-                image: 'https://avatars.githubusercontent.com/u/35387401?v=4'
-            };
+    io.on('connection', (socket) => {
+        console.log(`Un utilisateur est connecté, ID Socket: ${socket.id}`);
 
-            this.connectedUsers.push(newUser);
-            console.log(`Utilisateur ajouté: `, newUser);
+        emitConnectedUsers();
+        attachLogoutListener(socket);
+    });
+}
 
-            // Mise à jour de la liste des utilisateurs pour tous les clients avec les objets utilisateur
-            this.io.emit('updateUserList', this.connectedUsers.map(user => ({
-                id: user.socketId, // Utilisez l'attribut que vous préférez pour identifier de manière unique l'utilisateur
-                name: user.username,
-                image: user.image // Assurez-vous que cette URL est valide et accessible par les clients
-            })));
 
-            socket.on('disconnect', () => {
-                console.log(`Utilisateur déconnecté, ID: ${socket.id}`);
-                this.disconnectUser(socket);
-            });
-        });
-    }
+// Emit connected users to all clients
+const emitConnectedUsers = () => {
+    const connectedUsersOnline = connectedUsers.filter(user => user.isOnline)
 
-    disconnectUser(socket) {
-        // Trouver l'utilisateur à supprimer par socketId
-        const index = this.connectedUsers.findIndex(user => user.socketId === socket.id);
-        if (index !== -1) {
-            const [removedUser] = this.connectedUsers.splice(index, 1);
-            console.log(`Utilisateur supprimé: `, removedUser);
-            // Mise à jour de la liste des utilisateurs pour tous les clients
-            this.io.emit('updateUserList', this.connectedUsers.map(user => ({
-                id: user.socketId,
-                name: user.username,
-                image: user.image
-            })));
-        } else {
-            console.log(`Aucun utilisateur à supprimer pour l'ID: ${socket.id}`);
-        }
+    // Filtrer les utilisateurs déconnectés si nécessaire, ou les inclure tous
+    io.emit('updateUserList', connectedUsersOnline);
+    // console.log("emitConnectedUsers", connectedUsersOnline)
+}
+
+// Add user in connectedUsers if not already present
+const addConnectUser = async (userId) => {
+    let connectedUser = connectedUsers.find(user => user.userId === userId);
+
+    console.log({
+        userId,
+        connectedUser,
+        connectedUsers
+    })
+
+    if (!connectedUser) {
+        let user = await User.findById(userId);
+        // Nouvel utilisateur, l'ajouter à la liste
+        connectedUser = {
+            userId: userId.toString(),
+            username: user?.username || 'Unknown', // Exemple de génération de nom
+            image: 'https://avatars.githubusercontent.com/u/35387401?v=4', // URL d'image par défaut,
+            isOnline: true
+        };
+        connectedUsers.push({...connectedUser});
+        console.log(`Nouvel utilisateur ajouté: `, connectedUser);
     }
 }
 
-module.exports = SocketManager;
+// Remove user from connectedUsers
+const removeConnectedUser = (userId) => {
+    const index = connectedUsers.findIndex(user => user.userId === userId);
+    if (index !== -1) {
+        connectedUsers.splice(index, 1);
+        console.log(`Utilisateur supprimé: `, userId);
+    }
+}
+
+
+const attachLogoutListener  = (socket) => {
+    socket.on('logout', (userId) => {
+        // Optionnel : Marquez l'utilisateur comme déconnecté sans le supprimer immédiatement
+        const connectedUser = connectedUsers.find(user => user.userId === userId);
+
+        if (connectedUser) {
+            console.log(`Marquer l'utilisateur comme déconnecté: `, connectedUser.userId);
+            connectedUser.isOnline = false;
+            removeConnectedUser(connectedUser.userId);
+            emitConnectedUsers();
+        }
+    })
+}
+
+module.exports = {
+    connectedUsers,
+    init,
+    addConnectUser,
+    attachLogoutListener
+};

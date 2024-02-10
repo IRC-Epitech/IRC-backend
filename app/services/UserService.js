@@ -1,6 +1,7 @@
 const User = require('../models/UserModel');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
+const SocketManager = require('../../app/utils/socketManager');
 
 const createUser = async (userData) => {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -40,6 +41,8 @@ const authenticateUser = async (email, password) => {
     const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '24h' });
     user.token = token;
     await user.save();
+
+    await SocketManager.addConnectUser(user._id.toString());
 
     return { token, user };
 };

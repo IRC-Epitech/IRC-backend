@@ -23,13 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 
 applyRoutes(app);
 
-mongoose.connect('mongodb://localhost:27017/IRC')
+mongoose.connect('mongodb://127.0.0.1:27017/IRC')
     .then(() => console.log("Connecté avec succès à MongoDB"))
     .catch(err => console.error("Erreur de connexion MongoDB:", err));
 
 // Utilisez SocketManager pour gérer les connexions socket
-const socketManager = new SocketManager(io);
-socketManager.init();
+SocketManager.init(io);
 
 http.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
