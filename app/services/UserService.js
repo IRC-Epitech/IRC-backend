@@ -44,7 +44,14 @@ const authenticateUser = async (email, password) => {
 
     await SocketManager.addConnectUser(user._id.toString());
 
-    return { token, user };
+    // delete user.password;
+    const userSerialized = {
+        _id: user._id,
+        username: user.username,
+        email: user.email
+    }
+
+    return { token, user: userSerialized };
 };
 // Obtenir tous les utilisateurs
 const getAllUsers = async () => {

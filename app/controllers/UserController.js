@@ -53,8 +53,8 @@ exports.deleteUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
     try {
         const {email, password} = req.body;
-        const {token, user} = await userService.authenticateUser(email, password);
-        res.status(200).json({token, user: {id: user._id, email: user.email}});
+        const authPayload = await userService.authenticateUser(email, password);
+        res.status(200).json(authPayload);
     } catch (error) {
         res.status(401).send({message: error.message});
     }
