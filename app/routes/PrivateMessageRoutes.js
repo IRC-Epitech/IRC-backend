@@ -1,11 +1,12 @@
+// PrivateMessageRoutes.js
 const express = require('express');
-const router = express.Router();
 const PrivateMessageController = require('../controllers/PrivateMessageController');
-const authMiddleware = require("../middlewares/Auth");
+const router = express.Router();
 
-router.post('/messages', authMiddleware,PrivateMessageController.createPrivateMessage);
-router.get('/messages/:messageId',authMiddleware, PrivateMessageController.getPrivateMessage);
-router.put('/messages/:messageId',authMiddleware, PrivateMessageController.updatePrivateMessage);
-router.delete('/messages/:messageId',authMiddleware, PrivateMessageController.deletePrivateMessage);
-router.get('/messages/from/:senderId/to/:receiverId', authMiddleware,PrivateMessageController.getMessagesFromSenderToReceiver);
+// Route pour envoyer un message
+router.post('/private-messages', PrivateMessageController.postMessage);
+
+// Route pour récupérer les messages privés entre deux utilisateurs
+router.get('/private-messages/:senderId/:receiverId', PrivateMessageController.getPrivateMessages);
+
 module.exports = router;
