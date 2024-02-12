@@ -69,4 +69,29 @@ exports.getAllUsers = async (req, res) => {
         res.status(500).send(error);
     }
 };
+exports.changeUserPassword = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { newPassword } = req.body;
+        const updatedUser = await userService.updateUserPassword(userId, newPassword);
+        if (!updatedUser) {
+            return res.status(404).send({ message: 'Utilisateur non trouvé' });
+        }
+        res.status(200).send({ message: 'Mot de passe mis à jour avec succès' });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+exports.updateUserProfilePicture = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        // imagePath devrait être l'URL de l'image téléchargée ou un chemin d'accès sur le serveur
+        // Supposons que vous avez déjà géré le téléchargement d'image et que vous avez le chemin d'accès
+        const imagePath = req.body.imagePath;
+        const updatedUser = await userService.updateUserProfilePicture(userId, imagePath);
+        res.status(200).send(updatedUser);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
 

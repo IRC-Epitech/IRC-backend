@@ -9,6 +9,8 @@ router.put('/users/:userId', authMiddleware,userController.updateUser);
 router.delete('/users/:userId', authMiddleware,userController.deleteUser);
 router.get('/users', userController.getAllUsers);
 router.post('/login', userController.loginUser);
+router.put('/users/:userId/profile-picture', authMiddleware, userController.updateUserProfilePicture);
+router.put('/users/:userId/password', authMiddleware, userController.changeUserPassword);
 
 
 module.exports = router;
