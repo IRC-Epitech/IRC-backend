@@ -19,6 +19,11 @@ const updateUser = async (userId, updateData) => {
     }
     return User.findByIdAndUpdate(userId, updateData, {new: true});
 };
+const updateUserPassword = async (userId, newPassword) => {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    return User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
+};
+
 
 const deleteUser = async (userId) => {
     return User.findByIdAndDelete(userId);
