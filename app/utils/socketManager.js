@@ -12,6 +12,7 @@ const init = (_io) => {
         console.log(`Un utilisateur est connecté, ID Socket: ${socket.id}`);
 
         socket.on('joinConnectedUsers', async (userId) => {
+            console.log("joinConnectedUsers", userId)
             await addConnectUser(userId, socket.id);
         })
 
@@ -36,8 +37,22 @@ const emitConnectedUsers = () => {
 const addConnectUser = async (userId, socketId) => { // Ajouter socketId comme paramètre
     let connectedUser = connectedUsers.find(user => user.userId === userId);
 
+    // console.log("INTO", {
+    //     connectedUser,
+    //     userId,
+    //     socketId
+    // })
+
     if (!connectedUser) {
         let user = await User.findById(userId);
+
+
+        // console.log("add user", {
+        //     user,
+        //     userId,
+        //     socketId
+        // })
+
         connectedUser = {
             userId: userId.toString(),
             username: user?.username || 'Unknown',
@@ -49,6 +64,12 @@ const addConnectUser = async (userId, socketId) => { // Ajouter socketId comme p
     } else {
         // Si l'utilisateur existe déjà, mettre à jour son socketId
         connectedUser.socketId = socketId;
+        // console.log({
+        //     connectedUsers,
+        //     connectedUser,
+        //     socketId,
+        //     userId
+        // })
     }
 };
 
@@ -98,21 +119,20 @@ const handleGeneralChatMessage = (socket) => {
 }
 
 const handlePrivateMessage = (socket) => {
-    socket.on('sendPrivateMessage', ({ senderId, receiverUsername, text }) => {
+    socket.on('sendPrivateMessage', ({ senderId, receiverUsername, text , timestamp}) => {
         // Trouver le username de l'expéditeur en utilisant senderId
         const sender = connectedUsers.find(user => user.userId === senderId);
         const senderUsername = sender ? sender.username : "Inconnu";
 
         // Trouver le socketId du destinataire en utilisant receiverUsername
         const receiverSocketId = connectedUsers.find(user => user.username === receiverUsername)?.socketId;
-        console.log("Connected users:", connectedUsers);
-        console.log("Receiver socketId:", receiverSocketId);
 
-        console.log("Received message payload:", { senderId, senderUsername, receiverUsername, text });
+
+        console.log(receiverSocketId)
 
         if (receiverSocketId) {
             // Assurez-vous d'inclure senderUsername dans l'objet émis
-            io.to(receiverSocketId).emit('receivePrivateMessage', { senderId, senderUsername, receiverUsername, text });
+            io.to(receiverSocketId).emit('receivePrivateMessage', { senderId, senderUsername, receiverUsername, text, timestamp });
             console.log(`Message privé envoyé de ${senderUsername} à ${receiverUsername}: ${text}`);
         } else {
             console.log(`Destinataire non trouvé pour le username: ${receiverUsername}`);
