@@ -67,11 +67,18 @@ const getAllUsers = async () => {
     }
 };
 
+const updateUserProfilePicture = async (userId, imagePath) => {
+    return User.findByIdAndUpdate(userId, { profilePicture: imagePath }, { new: true });
+};
+
+
 module.exports = {
     createUser,
     getUserById,
     updateUser,
     deleteUser,
     authenticateUser,
-    getAllUsers
+    getAllUsers,
+    updateUserProfilePicture,
+    updateUserPassword
 };
