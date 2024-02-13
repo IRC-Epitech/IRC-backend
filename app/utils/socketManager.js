@@ -2,6 +2,8 @@ const User = require('../models/UserModel');
 
 let io;
 connectedUsers = [];
+let channels = {};
+let channelInvitations = {};
 
 
 const init = (_io) => {
@@ -20,6 +22,10 @@ const init = (_io) => {
         handlePrivateMessage(socket);
         emitConnectedUsers();
         attachLogoutListener(socket);
+        handleJoinChannel(socket);
+        handleChannelMessage(socket);
+        handleCreateChannel(socket);
+        inviteToChannel(socket);
     });
 }
 
@@ -140,6 +146,89 @@ const handlePrivateMessage = (socket) => {
     });
 }
 
+const handleCreateChannel = (socket) => {
+    socket.on('createChannel', ({ channelName, userId }) => {
+        if (channels[channelName]) {
+            socket.emit('channelCreationError', 'Channel name already exists.');
+        } else {
+            const imageUrl = `https://picsum.photos/200/300?random=${Math.floor(Math.random() * 1000)}`;
+            // Créer le nouveau canal avec le créateur comme seul membre
+            channels[channelName] = {
+                name: channelName,
+                createdBy: userId,
+                members: new Set([userId]),
+                imageUrl: imageUrl,
+            };
+
+            // Le créateur rejoint le canal
+            socket.join(channelName);
+
+            // Informer le créateur que le canal a été créé
+            socket.emit('channelCreated', { channelName, imageUrl });
+
+        }
+    });
+};
+const inviteToChannel = (socket) => {
+    socket.on('inviteToChannel', ({ channelId, userIdToInvite, inviterId }) => {
+        // Vérifier si le canal existe
+        if (!channels[channelId]) {
+            socket.emit('channelInviteError', 'Channel does not exist.');
+            return;
+        }
+
+        // Vérifier si l'inviteur est autorisé à inviter
+        const channel = channels[channelId];
+        if (channel.createdBy !== inviterId && !channel.members.has(inviterId)) {
+            socket.emit('channelInviteError', 'Not authorized to invite to this channel.');
+            return;
+        }
+
+        // Ajouter l'utilisateur invité à la liste des invitations en attente
+        if (!channelInvitations[channelId]) {
+            channelInvitations[channelId] = new Set();
+        }
+        channelInvitations[channelId].add(userIdToInvite);
+
+        // Trouver le socketId de l'utilisateur invité
+        const userToInvite = connectedUsers.find(user => user.userId === userIdToInvite);
+        if (userToInvite) {
+            // Envoyer une invitation à l'utilisateur
+            io.to(userToInvite.socketId).emit('channelInvitation', { channelId, channelName: channel.name, inviterId });
+        }
+    });
+};
+
+
+const handleJoinChannel = (socket) => {
+    socket.on('joinChannel', ({ channelId, userId }) => {
+        // Vérifier si l'utilisateur a été invité
+        if (channelInvitations[channelId] && channelInvitations[channelId].has(userId)) {
+            socket.join(channelId);
+            io.to(channelId).emit('channelWelcome', `${userId} has joined the channel.`);
+
+            // Retirer l'utilisateur de la liste des invitations
+            channelInvitations[channelId].delete(userId);
+            if (channelInvitations[channelId].size === 0) {
+                delete channelInvitations[channelId];
+            }
+        } else {
+            socket.emit('channelJoinError', 'Not invited or channel does not exist.');
+        }
+    });
+};
+
+
+const handleChannelMessage = (socket) => {
+    socket.on('sendChannelMessage', ({ channelId, senderId, text }) => {
+        io.to(channelId).emit('receiveChannelMessage', { senderId, text });
+    });
+
+
+    // envoyer au M si ça fonctionne
+};
+
+
 
 
 
@@ -150,6 +239,10 @@ module.exports = {
     addConnectUser,
     attachLogoutListener,
     handleGeneralChatMessage,
-    handlePrivateMessage
+    handlePrivateMessage,
+    handleJoinChannel,
+    handleChannelMessage,
+    handleCreateChannel,
+    inviteToChannel
 
 };
