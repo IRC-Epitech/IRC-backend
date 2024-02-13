@@ -10,7 +10,8 @@ router.delete('/users/:userId', authMiddleware,userController.deleteUser);
 router.get('/users', userController.getAllUsers);
 router.post('/login', userController.loginUser);
 router.put('/users/:userId/profile-picture', authMiddleware, userController.updateUserProfilePicture);
-router.put('/users/:userId/password', authMiddleware, userController.changeUserPassword);
+router.put('/users/:userId/email', authMiddleware, userController.updateUserEmail);
+router.put('/users/:userId/password', authMiddleware, userController.updateUserPassword);
 
 
 module.exports = router;

@@ -95,3 +95,38 @@ exports.updateUserProfilePicture = async (req, res) => {
     }
 };
 
+exports.updateUserPassword = async (req, res) => {
+    try {
+        const updatedUser = await userService.updateUserPassword(req.params.userId, req.body.password);
+        if (!updatedUser) {
+            return res.status(404).send({message: 'Utilisateur non trouvé'});
+        }
+        res.status(200).send(updatedUser);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+exports.updateUserEmail = async (req, res) => {
+    try {
+        const updatedUser = await userService.updateUserEmail(req.params.userId, req.body.email);
+        if (!updatedUser) {
+            return res.status(404).send({message: 'Utilisateur non trouvé'});
+        }
+        res.status(200).send(updatedUser);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+exports.updateUserName = async (req, res) => {
+    try {
+        const updatedUser = await userService.updateUserName(req.params.userId, req.body.name);
+        if (!updatedUser) {
+            return res.status(404).send({message: 'Utilisateur non trouvé'});
+        }
+        res.status(200).send(updatedUser);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
