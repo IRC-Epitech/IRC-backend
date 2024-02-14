@@ -11,7 +11,9 @@ async function createChannel(req, res) {
 
 async function inviteToChannel(req, res) {
     try {
-        const channel = await ChannelService.inviteToChannel(req.body);
+        // Modifiez pour passer seulement les champs nécessaires
+        const { channelId, userIdToInvite } = req.body;
+        const channel = await ChannelService.inviteToChannel({ channelId, userIdToInvite });
         res.json(channel);
     } catch (error) {
         res.status(400).json({ message: error.message });

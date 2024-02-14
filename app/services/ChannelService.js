@@ -22,16 +22,13 @@ async function createChannel({ name, createdBy, members }) {
     return channel;
 }
 
-async function inviteToChannel({ channelId, userIdToInvite, inviterId }) {
+async function inviteToChannel({ channelId, userIdToInvite }) {
     const channel = await Channel.findById(channelId);
     if (!channel) {
         throw new Error('Channel does not exist.');
     }
 
-    if (channel.createdBy.toString() !== inviterId && !channel.members.includes(inviterId)) {
-        throw new Error('Not authorized to invite to this channel.');
-    }
-
+    // Pas de vérification d'autorisation, on ajoute directement l'utilisateur
     if (!channel.members.includes(userIdToInvite)) {
         channel.members.push(userIdToInvite);
         await channel.save();
@@ -40,7 +37,7 @@ async function inviteToChannel({ channelId, userIdToInvite, inviterId }) {
     return channel;
 }
 
-
+// Trouver les canaux par ID utilisateur
 async function findChannelsByUserId(userId) {
     return Channel.find({ members: userId });
 }
