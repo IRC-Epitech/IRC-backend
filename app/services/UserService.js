@@ -19,11 +19,6 @@ const updateUser = async (userId, updateData) => {
     }
     return User.findByIdAndUpdate(userId, updateData, {new: true});
 };
-const updateUserPassword = async (userId, newPassword) => {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    return User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
-};
-
 
 const deleteUser = async (userId) => {
     return User.findByIdAndDelete(userId);
@@ -70,6 +65,17 @@ const getAllUsers = async () => {
 const updateUserProfilePicture = async (userId, imagePath) => {
     return User.findByIdAndUpdate(userId, { profilePicture: imagePath }, { new: true });
 };
+const updateUserEmail = async (userId, newEmail) => {
+    return User.findByIdAndUpdate(userId, { email: newEmail }, { new: true });
+};
+
+const updateUserPassword = async (userId, newPassword) => {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    return User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
+};
+const updateUserName = async (userId, newName) => {
+    return User.findByIdAndUpdate(userId, { username: newName }, { new: true });
+};
 
 
 module.exports = {
@@ -80,5 +86,7 @@ module.exports = {
     authenticateUser,
     getAllUsers,
     updateUserProfilePicture,
-    updateUserPassword
+    updateUserPassword,
+    updateUserName,
+    updateUserEmail
 };
