@@ -8,7 +8,7 @@ const PrivateMessageRoutes = require('../routes/PrivateMessageRoutes');
 
 const applyRoutes = (app) => {
     app.use(userRoutes);
-    app.use(channelRoutes);
+    app.use('/channels',channelRoutes);
     app.use(fileUploadRoutes);
     app.use(messageRoutes);
     app.use(userChannelRoutes);

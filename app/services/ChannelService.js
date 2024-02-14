@@ -1,25 +1,52 @@
 const Channel = require('../models/ChannelModel');
+const User = require('../models/UserModel'); // Assurez-vous d'avoir un modèle utilisateur
+/*
+* @param name - string
+* @param createdBy - string
+* @param members - array string
+* */
+async function createChannel({ name, createdBy, members }) {
+    const existingChannel = await Channel.findOne({ name });
+    if (existingChannel) {
+        throw new Error('Channel name already exists.');
+    }
 
-const createChannel = async (channelData) => {
-    const newChannel = new Channel(channelData);
-    return newChannel.save();
-};
+    const imageUrl = `https://picsum.photos/200/300?random=${Math.floor(Math.random() * 1000)}`;
+    const channel = await Channel.create({
+        name,
+        createdBy,
+        members,
+        imageUrl,
+    });
 
-const getChannelById = async (channelId) => {
-    return Channel.findById(channelId);
-};
+    return channel;
+}
 
-const updateChannel = async (channelId, updateData) => {
-    return Channel.findByIdAndUpdate(channelId, updateData, {new: true});
-};
+async function inviteToChannel({ channelId, userIdToInvite, inviterId }) {
+    const channel = await Channel.findById(channelId);
+    if (!channel) {
+        throw new Error('Channel does not exist.');
+    }
 
-const deleteChannel = async (channelId) => {
-    return Channel.findByIdAndDelete(channelId);
-};
+    if (channel.createdBy.toString() !== inviterId && !channel.members.includes(inviterId)) {
+        throw new Error('Not authorized to invite to this channel.');
+    }
+
+    if (!channel.members.includes(userIdToInvite)) {
+        channel.members.push(userIdToInvite);
+        await channel.save();
+    }
+
+    return channel;
+}
+
+
+async function findChannelsByUserId(userId) {
+    return Channel.find({ members: userId });
+}
 
 module.exports = {
     createChannel,
-    getChannelById,
-    updateChannel,
-    deleteChannel
+    inviteToChannel,
+    findChannelsByUserId
 };

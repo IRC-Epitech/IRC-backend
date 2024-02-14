@@ -1,10 +1,12 @@
 const express = require('express');
-const router = express.Router();
-const channelController = require('../controllers/ChannelController');
+const ChannelController = require('../controllers/ChannelController');
 
-router.post('/channels', channelController.createChannel);
-router.get('/channels/:channelId', channelController.getChannel);
-router.put('/channels/:channelId', channelController.updateChannel);
-router.delete('/channels/:channelId', channelController.deleteChannel);
+const router = express.Router();
+
+router.post('/create', ChannelController.createChannel);
+router.post('/invite', ChannelController.inviteToChannel);
+router.get('/user/:userId', ChannelController.getChannelsByUserId);
+
+// Ajoutez d'autres routes pour les messages, les invitations, etc.
 
 module.exports = router;

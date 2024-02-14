@@ -1,4 +1,5 @@
 const User = require('../models/UserModel');
+const { v4: uuidv4 } = require('uuid');
 
 let io;
 connectedUsers = [];
@@ -152,8 +153,11 @@ const handleCreateChannel = (socket) => {
             socket.emit('channelCreationError', 'Channel name already exists.');
         } else {
             const imageUrl = `https://picsum.photos/200/300?random=${Math.floor(Math.random() * 1000)}`;
+            const id = uuidv4(); // Générer un ID unique pour le canal
+
             // Créer le nouveau canal avec le créateur comme seul membre
             channels[channelName] = {
+                id,
                 name: channelName,
                 createdBy: userId,
                 members: new Set([userId]),
@@ -164,8 +168,7 @@ const handleCreateChannel = (socket) => {
             socket.join(channelName);
 
             // Informer le créateur que le canal a été créé
-            socket.emit('channelCreated', { channelName, imageUrl });
-
+            socket.emit('channelCreated', { channelName, imageUrl, id }); // Inclure l'ID dans l'émission
         }
     });
 };
