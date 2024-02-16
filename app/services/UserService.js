@@ -77,6 +77,14 @@ const updateUserName = async (userId, newName) => {
     return User.findByIdAndUpdate(userId, { username: newName }, { new: true });
 };
 
+const searchUsersByName = async (name) => {
+    if (!name) throw new Error('Le nom de recherche est requis');
+
+    // Utilisez une expression régulière pour une recherche insensible à la casse et partielle
+    const searchPattern = new RegExp(name, 'i');
+    return User.find({ username: { $regex: searchPattern } });
+};
+
 
 module.exports = {
     createUser,
@@ -88,5 +96,6 @@ module.exports = {
     updateUserProfilePicture,
     updateUserPassword,
     updateUserName,
-    updateUserEmail
+    updateUserEmail,
+    searchUsersByName
 };

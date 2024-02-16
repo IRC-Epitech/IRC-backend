@@ -9,16 +9,6 @@ async function createChannel(req, res) {
     }
 }
 
-async function inviteToChannel(req, res) {
-    try {
-        // Modifiez pour passer seulement les champs nécessaires
-        const { channelId, userIdToInvite } = req.body;
-        const channel = await ChannelService.inviteToChannel({ channelId, userIdToInvite });
-        res.json(channel);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-}
 
 async function getChannelsByUserId(req, res) {
     try {
@@ -30,8 +20,19 @@ async function getChannelsByUserId(req, res) {
     }
 }
 
+async function addMemberToChannel(req, res) {
+    try {
+        const { channelId, userId } = req.params;
+        const updatedChannel = await ChannelService.addMemberToChannel(channelId, userId);
+        res.json(updatedChannel);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+
 module.exports = {
     createChannel,
-    inviteToChannel,
-    getChannelsByUserId
+    getChannelsByUserId,
+    addMemberToChannel
 };

@@ -22,17 +22,22 @@ async function createChannel({ name, createdBy, members }) {
     return channel;
 }
 
-async function inviteToChannel({ channelId, userIdToInvite }) {
+async function addMemberToChannel(channelId, userId) {
+    // Vérifiez d'abord si l'utilisateur est déjà membre du canal
     const channel = await Channel.findById(channelId);
     if (!channel) {
-        throw new Error('Channel does not exist.');
+        throw new Error('Channel not found.');
     }
 
-    // Pas de vérification d'autorisation, on ajoute directement l'utilisateur
-    if (!channel.members.includes(userIdToInvite)) {
-        channel.members.push(userIdToInvite);
-        await channel.save();
+    // Vérifie si l'utilisateur est déjà dans le tableau des membres
+    const isMember = channel.members.some(member => member.equals(userId));
+    if (isMember) {
+        throw new Error('User is already a member of the channel.');
     }
+
+    // Ajoutez l'utilisateur au tableau des membres
+    channel.members.push(userId);
+    await channel.save();
 
     return channel;
 }
@@ -44,6 +49,6 @@ async function findChannelsByUserId(userId) {
 
 module.exports = {
     createChannel,
-    inviteToChannel,
-    findChannelsByUserId
+    findChannelsByUserId,
+    addMemberToChannel
 };

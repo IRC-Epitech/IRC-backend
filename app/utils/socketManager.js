@@ -23,10 +23,11 @@ const init = (_io) => {
         handlePrivateMessage(socket);
         emitConnectedUsers();
         attachLogoutListener(socket);
-        handleJoinChannel(socket);
         handleChannelMessage(socket);
         handleCreateChannel(socket);
-        inviteToChannel(socket);
+        addUserToChannel(socket);
+        handleChannelMessage(socket);
+        joinChannel(socket);
     });
 }
 
@@ -172,59 +173,33 @@ const handleCreateChannel = (socket) => {
         }
     });
 };
-const inviteToChannel = (socket) => {
-    socket.on('inviteToChannel', ({ channelId, userIdToInvite, inviterId }) => {
-        // Vérifier si le canal existe
-        if (!channels[channelId]) {
-            socket.emit('channelInviteError', 'Channel does not exist.');
-            return;
-        }
 
-        // Vérifier si l'inviteur est autorisé à inviter
+const addUserToChannel = (socket) => {
+    socket.on('addUserToChannel', ({ channelId, userIdToAdd }) => {
         const channel = channels[channelId];
-        if (channel.createdBy !== inviterId && !channel.members.has(inviterId)) {
-            socket.emit('channelInviteError', 'Not authorized to invite to this channel.');
-            return;
-        }
-
-        // Ajouter l'utilisateur invité à la liste des invitations en attente
-        if (!channelInvitations[channelId]) {
-            channelInvitations[channelId] = new Set();
-        }
-        channelInvitations[channelId].add(userIdToInvite);
-
-        // Trouver le socketId de l'utilisateur invité
-        const userToInvite = connectedUsers.find(user => user.userId === userIdToInvite);
-        if (userToInvite) {
-            // Envoyer une invitation à l'utilisateur
-            io.to(userToInvite.socketId).emit('channelInvitation', { channelId, channelName: channel.name, inviterId });
-        }
-    });
-};
-
-
-const handleJoinChannel = (socket) => {
-    socket.on('joinChannel', ({ channelId, userId }) => {
-        // Vérifier si l'utilisateur a été invité
-        if (channelInvitations[channelId] && channelInvitations[channelId].has(userId)) {
-            socket.join(channelId);
-            io.to(channelId).emit('channelWelcome', `${userId} has joined the channel.`);
-
-            // Retirer l'utilisateur de la liste des invitations
-            channelInvitations[channelId].delete(userId);
-            if (channelInvitations[channelId].size === 0) {
-                delete channelInvitations[channelId];
-            }
+        if (channel) {
+            channel.members.add(userIdToAdd);
+            io.to(channelId).emit('userAddedToChannel', { channelId, userId: userIdToAdd });
+            console.log(`User ${userIdToAdd} added to channel ${channelId}`);
         } else {
-            socket.emit('channelJoinError', 'Not invited or channel does not exist.');
+            socket.emit('errorAddingUserToChannel', 'Channel does not exist.');
         }
     });
 };
 
+const joinChannel = (socket) => {
+    socket.on('joinChannel', ({ channelId, userId }) => {
+        console.log(`${userId} rejoint le canal ${channelId}`);
+        socket.join(channelId);
+    });
+};
 
 const handleChannelMessage = (socket) => {
-    socket.on('sendChannelMessage', ({ channelId, senderId, text }) => {
-        io.to(channelId).emit('receiveChannelMessage', { senderId, text });
+    socket.on('sendChannelMessage', (message) => {
+        const { channelId, senderId, text } = message;
+        console.log(`Tentative d'envoi d'un message au canal ${channelId} par l'utilisateur ${senderId}`);
+        io.to(channelId).emit('receiveChannelMessage', message);
+        console.log(`Message envoyé au canal ${channelId}: ${text}`);
     });
 
 
@@ -243,9 +218,8 @@ module.exports = {
     attachLogoutListener,
     handleGeneralChatMessage,
     handlePrivateMessage,
-    handleJoinChannel,
     handleChannelMessage,
     handleCreateChannel,
-    inviteToChannel
+    addUserToChannel
 
 };

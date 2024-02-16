@@ -130,3 +130,13 @@ exports.updateUserName = async (req, res) => {
         res.status(500).send(error);
     }
 };
+
+exports.searchUsersByName = async (req, res) => {
+    try {
+        const searchQuery = req.query.name;
+        const users = await userService.searchUsersByName(searchQuery);
+        res.status(200).send(users);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
