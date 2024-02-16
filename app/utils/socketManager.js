@@ -26,7 +26,6 @@ const init = (_io) => {
         handleChannelMessage(socket);
         handleCreateChannel(socket);
         addUserToChannel(socket);
-        handleChannelMessage(socket);
         joinChannel(socket);
     });
 }

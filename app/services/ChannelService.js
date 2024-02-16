@@ -18,8 +18,9 @@ async function createChannel({ name, createdBy, members }) {
         members,
         imageUrl,
     });
-
-    return channel;
+    // replace channel _id with id
+    const { _id, ...rest } = channel._doc;
+    return { id: _id, ...rest };
 }
 
 async function addMemberToChannel(channelId, userId) {
@@ -44,7 +45,12 @@ async function addMemberToChannel(channelId, userId) {
 
 // Trouver les canaux par ID utilisateur
 async function findChannelsByUserId(userId) {
-    return Channel.find({ members: userId });
+    const channels = await Channel.find({ members: userId });
+    // replace all _id with id
+    return channels.map(channel => {
+        const { _id, ...rest } = channel._doc;
+        return { id: _id, ...rest };
+    });
 }
 
 module.exports = {
