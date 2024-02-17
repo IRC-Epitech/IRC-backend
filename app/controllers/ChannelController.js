@@ -30,9 +30,19 @@ async function addMemberToChannel(req, res) {
     }
 }
 
+const deleteChannel = async (req, res) => {
+    try {
+        const { channelId } = req.params;
+        await ChannelService.deleteChannel(channelId);
+        res.status(200).json({ message: 'Channel deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
 
 module.exports = {
     createChannel,
     getChannelsByUserId,
-    addMemberToChannel
+    addMemberToChannel,
+    deleteChannel
 };

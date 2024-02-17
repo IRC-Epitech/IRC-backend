@@ -53,8 +53,22 @@ async function findChannelsByUserId(userId) {
     });
 }
 
+const deleteChannel = async (channelId) => {
+    try {
+        const deletedChannel = await Channel.findByIdAndDelete(channelId);
+        if (!deletedChannel) {
+            throw new Error('Channel not found');
+        }
+        return deletedChannel;
+    } catch (error) {
+        // Gérer les erreurs (par exemple, canal non trouvé, problème de base de données, etc.)
+        throw error;
+    }
+};
+
 module.exports = {
     createChannel,
     findChannelsByUserId,
-    addMemberToChannel
+    addMemberToChannel,
+    deleteChannel
 };
