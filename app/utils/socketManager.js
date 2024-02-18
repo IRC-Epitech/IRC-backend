@@ -63,7 +63,7 @@ const addConnectUser = async (userId, socketId) => { // Ajouter socketId comme p
         connectedUser = {
             userId: userId.toString(),
             username: user?.username || 'Unknown',
-            image: 'https://avatars.githubusercontent.com/u/35387401?v=4', // Exemple d'image
+            imageUrl: user?.imageUrl,
             isOnline: true,
             socketId: socketId // Sauvegarder le socketId ici
         };

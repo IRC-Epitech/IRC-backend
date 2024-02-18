@@ -2,10 +2,12 @@ const User = require('../models/UserModel');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const SocketManager = require('../../app/utils/socketManager');
+const FakeService = require("./FakeService");
 
 const createUser = async (userData) => {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const newUser = new User({ ...userData, password: hashedPassword });
+    const imageUrl =  FakeService.generateDiceBearURL(userData.username, 'fun-emoji');
+    const newUser = new User({ ...userData, imageUrl, password: hashedPassword });
     return await newUser.save();
 };
 
@@ -48,7 +50,8 @@ const authenticateUser = async (email, password) => {
     const userSerialized = {
         id: user._id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        imageUrl: user.imageUrl,
     }
 
     return { token, user: userSerialized };

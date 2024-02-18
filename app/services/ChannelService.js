@@ -1,6 +1,7 @@
 const Channel = require('../models/ChannelModel');
 const User = require('../models/UserModel');
-const {Types} = require("mongoose"); // Assurez-vous d'avoir un modèle utilisateur
+const {Types} = require("mongoose");
+const FakeService = require("./FakeService"); // Assurez-vous d'avoir un modèle utilisateur
 /*
 * @param name - string
 * @param createdBy - string
@@ -12,7 +13,7 @@ async function createChannel({ name, createdBy, members }) {
         throw new Error('Channel name already exists.');
     }
 
-    const imageUrl = `https://picsum.photos/200/300?random=${Math.floor(Math.random() * 1000)}`;
+    const imageUrl = FakeService.generateDiceBearURL(name, 'initials')
     const channel = await Channel.create({
         name,
         createdBy,
@@ -67,7 +68,7 @@ const deleteChannel = async (channelId) => {
     }
 };
 
-const getMembersByChannelId = async (channelId) => {
+getMembersByChannelId = async (channelId) => {
     const channel = await Channel.findById(channelId);
     if (!channel) {
         throw new Error('Channel not found');
