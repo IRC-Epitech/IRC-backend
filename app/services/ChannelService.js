@@ -78,10 +78,20 @@ getMembersByChannelId = async (channelId) => {
     return members;
 };
 
+listChannels = async (filter) => {
+    const query = {};
+    if (filter) {
+        query.name = { $regex: filter, $options: 'i' }; // Recherche insensible à la casse
+    }
+    return Channel.find(query);
+};
+
 module.exports = {
     createChannel,
     findChannelsByUserId,
     addMemberToChannel,
     deleteChannel,
-    getMembersByChannelId
+    getMembersByChannelId,
+    listChannels
+
 };

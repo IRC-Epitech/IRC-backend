@@ -57,10 +57,22 @@ const getMembersByChannelId = async (req, res) => {
     }
 };
 
+const listChannels = async (req, res) => {
+    try {
+        const filter = req.query.filter;
+        const channels = await ChannelService.listChannels(filter);
+        res.json(channels);
+    } catch (error) {
+        console.error('Error in listChannels Controller:', error);
+        res.status(500).send(error.message);
+    }
+};
+
 module.exports = {
     createChannel,
     getChannelsByUserId,
     addMemberToChannel,
     deleteChannel,
-    getMembersByChannelId
+    getMembersByChannelId,
+    listChannels
 };
