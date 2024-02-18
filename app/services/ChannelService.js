@@ -1,5 +1,6 @@
 const Channel = require('../models/ChannelModel');
-const User = require('../models/UserModel'); // Assurez-vous d'avoir un modèle utilisateur
+const User = require('../models/UserModel');
+const {Types} = require("mongoose"); // Assurez-vous d'avoir un modèle utilisateur
 /*
 * @param name - string
 * @param createdBy - string
@@ -66,9 +67,20 @@ const deleteChannel = async (channelId) => {
     }
 };
 
+const getMembersByChannelId = async (channelId) => {
+    const channel = await Channel.findById(channelId);
+    if (!channel) {
+        throw new Error('Channel not found');
+    }
+    // Assurez-vous que channel.members est un tableau d'ObjectId ou de chaînes
+    const members = await User.find({ '_id': { $in: channel.members } });
+    return members;
+};
+
 module.exports = {
     createChannel,
     findChannelsByUserId,
     addMemberToChannel,
-    deleteChannel
+    deleteChannel,
+    getMembersByChannelId
 };

@@ -40,9 +40,27 @@ const deleteChannel = async (req, res) => {
     }
 };
 
+const getMembersByChannelId = async (req, res) => {
+    try {
+        const channelId = req.params.channelId;
+        if (!channelId) {
+            return res.status(400).json({ message: "Channel ID is required" });
+        }
+
+        const members = await ChannelService.getMembersByChannelId(channelId);
+        if (members.length === 0) {
+            return res.status(404).json({ message: "No members found in this channel" });
+        }
+        res.json(members);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     createChannel,
     getChannelsByUserId,
     addMemberToChannel,
-    deleteChannel
+    deleteChannel,
+    getMembersByChannelId
 };
